@@ -1,10 +1,10 @@
 {
-    "routes": [
-      {
-        "src": "/(.*)",
-        "headers": {
-          "Content-Security-Policy": "script-src 'self' 'unsafe-eval' https://telegram.org; object-src 'none';"
-        }
+  "routes": [
+    {
+      "src": "/(.*)",
+      "headers": {
+        "Content-Security-Policy": "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://telegram.org; object-src 'none';"
       }
-    ]
-  }
+    }
+  ]
+}
