@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Magician's Battlefront</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    #battleCanvas {
+      border: 2px solid #6a4c93;
+      background-color: #1a1a2e;
+      margin: 20px auto;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h1>Magician's Battlefront</h1>
+  <div class="user-info">
+    <p>Health: <span id="health">100</span>/100</p>
+    <p>Coins: <span id="coin-count">0</span></p>
+    <p>Active Spells: <span id="active-spells">None</span></p>
+  </div>
+  
+  <canvas id="battleCanvas" width="800" height="600"></canvas>
+  
+  <div class="navigation">
+    <a href="index.html" class="nav-btn">Back to Bubbles</a>
+    <a href="shop.html" class="nav-btn">Magic Shop</a>
+  </div>
+  
+  <script src="battle.js"></script>
+</body>
+</html>

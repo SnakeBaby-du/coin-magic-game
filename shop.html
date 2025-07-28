@@ -2,13 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>魔法商店</title>
+  <title>Magic Shop</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>魔法商店</h1>
+  <h1>Magic Shop</h1>
+  <div class="user-info">
+    <p>Magic Bubbles: <span id="magic-count">0</span></p>
+  </div>
+  
+  <div class="loading">Loading spells...</div>
   <ul id="shopList"></ul>
-  <a href="index.html">返回泡泡页面</a>
-  <script src="script.js"></script>
+  
+  <div class="navigation">
+    <a href="index.html" class="nav-btn">Back to Bubbles</a>
+    <a href="battle.html" class="nav-btn">Go to Battle</a>
+  </div>
+  
+  <script src="shop.js"></script>
 </body>
 </html>

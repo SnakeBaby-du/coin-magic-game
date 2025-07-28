@@ -2,19 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>翻魔法泡泡</title>
+  <title>Magic Bubble Flipper</title>
   <meta http-equiv="Content-Security-Policy" 
-        content="script-src 'self' 'unsafe-eval' https://telegram.org https://telegram-web.app; object-src 'none'">
+        content="script-src 'self' 'unsafe-eval' https://telegram.org; object-src 'none'">
   <link rel="stylesheet" href="style.css">
-  <link rel="preconnect" href="https://telegram.org">
-  <link rel="dns-prefetch" href="https://telegram.org">
 </head>
 <body>
-  <h1>翻魔法泡泡</h1>
-  <p id="username"></p>
-  <button id="flipBtn">翻一个泡泡</button>
-  <p id="result"></p>
-  <a href="shop.html">进入魔法商店</a>
+  <h1>Magic Bubble Flipper</h1>
+  <div class="user-info">
+    <p id="username">Welcome, Player!</p>
+    <p>Magic Bubbles: <span id="magic-count">0</span></p>
+    <p>Coins: <span id="coin-count">0</span></p>
+  </div>
+  
+  <div class="game-area">
+    <button id="flipBtn">Flip a Bubble</button>
+    <div id="result"></div>
+  </div>
+  
+  <div class="navigation">
+    <a href="shop.html" class="nav-btn">Magic Shop</a>
+    <a href="battle.html" class="nav-btn">Go to Battle</a>
+    <a href="#" id="hireBtn" class="nav-btn">Hire Assistant (10 coins)</a>
+  </div>
+  
   <script src="script.js"></script>
 </body>
 </html>

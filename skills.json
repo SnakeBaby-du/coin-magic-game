@@ -1,7 +1,32 @@
 [
-  { "name": "火球术", "cost": 3 },
-  { "name": "寒冰术", "cost": 4 },
-  { "name": "治愈术", "cost": 2 },
-  { "name": "闪电链", "cost": 5 },
-  { "name": "护盾术", "cost": 3 }
+  {
+    "id": "fireball",
+    "name": "Fireball",
+    "description": "Launches powerful fire projectiles",
+    "cost": 15
+  },
+  {
+    "id": "healing",
+    "name": "Healing Aura",
+    "description": "Slowly regenerates health over time",
+    "cost": 20
+  },
+  {
+    "id": "shield",
+    "name": "Magic Shield",
+    "description": "Reduces damage taken from enemies",
+    "cost": 25
+  },
+  {
+    "id": "lightning",
+    "name": "Chain Lightning",
+    "description": "Strikes multiple enemies at once",
+    "cost": 30
+  },
+  {
+    "id": "freeze",
+    "name": "Freeze Blast",
+    "description": "Slows all enemies for 5 seconds",
+    "cost": 35
+  }
 ]
