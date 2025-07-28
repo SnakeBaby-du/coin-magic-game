@@ -1,92 +1,64 @@
-// ====== 初始化部分 ======
-console.log("[SYSTEM] 游戏初始化开始");
+// ====== 安全初始化 ======
+console.log("[SECURE] 初始化开始");
 
-// 1. 环境检测
-const isTelegram = navigator.userAgent.includes('Telegram');
-let tg = { initDataUnsafe: { user: { username: "冒险者" } } };
+// 1. 检测 Telegram 环境
+const isTelegram = /Telegram/.test(navigator.userAgent) || 
+                   window.Telegram?.WebApp?.initData;
 
-// 2. Telegram SDK初始化
-if (isTelegram && window.Telegram?.WebApp) {
+// 2. 创建安全沙箱环境
+const tg = (() => {
   try {
-    tg = window.Telegram.WebApp;
-    tg.expand();
-    console.log("[SYSTEM] Telegram SDK 加载成功");
-    
-    // 更新用户名显示
-    const usernameEl = document.getElementById('username');
-    if (usernameEl) {
-      usernameEl.textContent = `欢迎，${tg.initDataUnsafe.user?.username || '旅行者'}`;
-    }
+    return isTelegram ? window.Telegram.WebApp : {
+      initDataUnsafe: { user: { username: "玩家" } },
+      expand: () => console.log("[SECURE] 非Telegram环境模拟")
+    };
   } catch (e) {
-    console.error("[ERROR] Telegram初始化失败:", e);
+    console.error("[SECURE] 初始化失败:", e);
+    return { initDataUnsafe: {} };
   }
+})();
+
+// 3. 安全执行初始化
+if (tg.expand) {
+  setTimeout(() => { // 确保DOM加载后执行
+    try {
+      tg.expand();
+      console.log("[SECURE] Telegram SDK 已激活");
+    } catch (e) {
+      console.warn("[SECURE] 窗口扩展失败:", e);
+    }
+  }, 300);
 }
 
 // ====== 翻泡泡逻辑 ======
-const flipBtn = document.getElementById('flipBtn');
-if (flipBtn) {
+document.addEventListener('DOMContentLoaded', () => {
+  const flipBtn = document.getElementById('flipBtn');
+  if (!flipBtn) return;
+
   flipBtn.addEventListener('click', () => {
     const resultEl = document.getElementById('result');
     if (!resultEl) return;
 
     try {
-      // 安全随机算法
-      const results = [
-        { type: '🔥 火焰泡泡', value: 1 },
-        { type: '💧 水泡泡', value: 1 },
-        { type: '🌪️ 风泡泡', value: 1 },
-        { type: '☁️ 空泡泡', value: 0 }
+      // 完全避免动态代码执行
+      const BUBBLES = [
+        { emoji: '🔥', name: '火焰泡泡', value: 1 },
+        { emoji: '💧', name: '水泡泡', value: 1 },
+        { emoji: '🌪️', name: '风泡泡', value: 1 },
+        { emoji: '☁️', name: '空泡泡', value: 0 }
       ];
-      const index = Math.floor(Math.random() * 4);
-      const { type, value } = results[index];
+      const index = crypto.getRandomValues(new Uint32Array(1))[0] % 4;
+      const { emoji, name, value } = BUBBLES[index];
 
-      // 更新魔法值
-      let magic = parseInt(localStorage.getItem('magic')) || 0;
-      magic += value;
-      localStorage.setItem('magic', magic);
+      // 更新计数（安全类型转换）
+      const magic = Math.max(0, parseInt(localStorage.getItem('magic') || 0) + value;
+      localStorage.setItem('magic', magic.toString());
 
-      // 显示结果
-      resultEl.textContent = `获得：${type}（总计 ${magic} 个魔法泡泡）`;
+      // 显示结果（纯文本输出）
+      resultEl.textContent = `${emoji} 获得 ${name}！当前魔法: ${magic}`;
     } catch (e) {
-      console.error("[ERROR] 翻泡泡出错:", e);
-      resultEl.textContent = "魔法失效了，请重试！";
+      resultEl.textContent = "魔法波动异常！";
+      console.error("[SECURE] 操作失败:", e);
     }
   });
-}
-
-// ====== 商店逻辑 ======
-if (window.location.pathname.includes('shop.html')) {
-  const shopList = document.getElementById('shopList');
-  if (shopList) {
-    shopList.innerHTML = '<li class="loading">加载魔法技能中...</li>';
-    
-    fetch('skills.json')
-      .then(res => res.ok ? res.json() : Promise.reject('加载失败'))
-      .then(skills => {
-        shopList.innerHTML = '';
-        const magic = parseInt(localStorage.getItem('magic')) || 0;
-        
-        skills.forEach(skill => {
-          const li = document.createElement('li');
-          li.className = 'skill-item';
-          li.innerHTML = `
-            <span class="skill-name">${skill.name}</span>
-            <span class="skill-cost">${skill.cost} 魔法泡泡</span>
-            <button class="buy-btn" ${magic < skill.cost ? 'disabled' : ''}>
-              购买
-            </button>
-          `;
-          
-          li.querySelector('.buy-btn').addEventListener('click', () => {
-            alert(`${skill.name} 购买成功！已发送给前线魔术师。`);
-          });
-          
-          shopList.appendChild(li);
-        });
-      })
-      .catch(e => {
-        console.error("[ERROR] 加载技能失败:", e);
-        shopList.innerHTML = '<li class="error">魔法书被封印了，请稍后再试</li>';
-      });
-  }
-}
+});
