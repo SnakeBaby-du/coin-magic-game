@@ -1,41 +1,92 @@
-// 1. 添加SDK加载检测
-console.log("[CSP] 开始加载Telegram SDK");
+// ====== 初始化部分 ======
+console.log("[SYSTEM] 游戏初始化开始");
 
-// 2. 安全初始化
-let tg;
-try {
-  tg = window.Telegram?.WebApp;
-  if (!tg) throw new Error("SDK未加载");
-  
-  // 3. 添加版本兼容检测
-  if (typeof tg.expand === 'function') {
+// 1. 环境检测
+const isTelegram = navigator.userAgent.includes('Telegram');
+let tg = { initDataUnsafe: { user: { username: "冒险者" } } };
+
+// 2. Telegram SDK初始化
+if (isTelegram && window.Telegram?.WebApp) {
+  try {
+    tg = window.Telegram.WebApp;
     tg.expand();
-    console.log("[CSP] Telegram SDK初始化成功");
-  } else {
-    console.warn("[CSP] 当前环境不支持WebApp");
+    console.log("[SYSTEM] Telegram SDK 加载成功");
+    
+    // 更新用户名显示
+    const usernameEl = document.getElementById('username');
+    if (usernameEl) {
+      usernameEl.textContent = `欢迎，${tg.initDataUnsafe.user?.username || '旅行者'}`;
+    }
+  } catch (e) {
+    console.error("[ERROR] Telegram初始化失败:", e);
   }
-} catch (e) {
-  console.error("[CSP] 初始化失败:", e);
-  tg = { initDataUnsafe: { user: { username: "玩家" } }; // 模拟数据
 }
 
-// 4. 翻泡泡逻辑（完全避免eval）
-document.getElementById('flipBtn')?.addEventListener('click', function() {
-  const types = ['🔥 火焰泡泡', '💧 水泡泡', '🌪️ 风泡泡', '☁️ 空泡泡'];
-  const result = document.getElementById('result');
-  
-  try {
-    // 使用预定义数组+索引（绝对安全）
-    const randomIndex = Math.floor(Math.random() * 4); // 0-3
-    const gain = types[randomIndex];
+// ====== 翻泡泡逻辑 ======
+const flipBtn = document.getElementById('flipBtn');
+if (flipBtn) {
+  flipBtn.addEventListener('click', () => {
+    const resultEl = document.getElementById('result');
+    if (!resultEl) return;
+
+    try {
+      // 安全随机算法
+      const results = [
+        { type: '🔥 火焰泡泡', value: 1 },
+        { type: '💧 水泡泡', value: 1 },
+        { type: '🌪️ 风泡泡', value: 1 },
+        { type: '☁️ 空泡泡', value: 0 }
+      ];
+      const index = Math.floor(Math.random() * 4);
+      const { type, value } = results[index];
+
+      // 更新魔法值
+      let magic = parseInt(localStorage.getItem('magic')) || 0;
+      magic += value;
+      localStorage.setItem('magic', magic);
+
+      // 显示结果
+      resultEl.textContent = `获得：${type}（总计 ${magic} 个魔法泡泡）`;
+    } catch (e) {
+      console.error("[ERROR] 翻泡泡出错:", e);
+      resultEl.textContent = "魔法失效了，请重试！";
+    }
+  });
+}
+
+// ====== 商店逻辑 ======
+if (window.location.pathname.includes('shop.html')) {
+  const shopList = document.getElementById('shopList');
+  if (shopList) {
+    shopList.innerHTML = '<li class="loading">加载魔法技能中...</li>';
     
-    let magic = parseInt(localStorage.getItem('magic')) || 0;
-    if (randomIndex !== 3) magic++; // 第4个是空泡泡
-    
-    localStorage.setItem('magic', magic);
-    result.textContent = `翻到：${gain}（当前${magic}个）`;
-  } catch (e) {
-    result.textContent = "操作失败";
-    console.error("[CSP] 翻泡泡错误:", e);
+    fetch('skills.json')
+      .then(res => res.ok ? res.json() : Promise.reject('加载失败'))
+      .then(skills => {
+        shopList.innerHTML = '';
+        const magic = parseInt(localStorage.getItem('magic')) || 0;
+        
+        skills.forEach(skill => {
+          const li = document.createElement('li');
+          li.className = 'skill-item';
+          li.innerHTML = `
+            <span class="skill-name">${skill.name}</span>
+            <span class="skill-cost">${skill.cost} 魔法泡泡</span>
+            <button class="buy-btn" ${magic < skill.cost ? 'disabled' : ''}>
+              购买
+            </button>
+          `;
+          
+          li.querySelector('.buy-btn').addEventListener('click', () => {
+            alert(`${skill.name} 购买成功！已发送给前线魔术师。`);
+          });
+          
+          shopList.appendChild(li);
+        });
+      })
+      .catch(e => {
+        console.error("[ERROR] 加载技能失败:", e);
+        shopList.innerHTML = '<li class="error">魔法书被封印了，请稍后再试</li>';
+      });
   }
-});
+}
